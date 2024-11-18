@@ -54,7 +54,7 @@
     text-decoration: none;
     color:rgb(0,0,0);
     /* font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; */
-    font-family: var(--wp--preset--font-family--epilogue);
+    font-family: 'Epilogue', sans-serif;
     font-style: normal;
     font-size: 28px;
   }
@@ -89,7 +89,7 @@
     align-items: center;
     gap: 1rem;
     background-color: #fff;
-    font-family: var(--wp--preset--font-family--epilogue);
+    font-family: 'Epilogue', sans-serif;
   }
 
   .leoFace {
@@ -144,11 +144,11 @@
         background-color: #ccc;
     }
     .content {
-        font-family: var(--wp--preset--font-family--epilogue);
-        font-size: 28px;
+        font-family: 'Epilogue', sans-serif;
+        font-size: 24px;
         padding-top: 4%;
-        padding-left: 35%;
-        width: 90%;    
+        padding-left: 30%;
+        width: 95%;    
     }
 
 
