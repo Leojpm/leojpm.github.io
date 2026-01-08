@@ -3,7 +3,7 @@
   <head>
     <title>Home</title>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href='https://fonts.googleapis.com/css?family=Epilogue' rel='stylesheet'>
@@ -17,16 +17,29 @@
         <a href="/research.html">Research</a>
         <a href="/publications.html">Publications</a>
         <a href="/CV.html">CV</a>
+        <!-- <a href="/timeline.html">Timeline</a> -->
+        <!-- <a href="/fieldwork.html">Fieldwork</a> -->
 
         <button onclick="myFunction()">
             <i class="fas fa-moon"></i> 
         </button>
 
         <script>
-        function myFunction() {
-        var element = document.body;
-        element.classList.toggle("darkMode");
+        function applySavedDarkMode() {
+          const saved = localStorage.getItem('darkMode');
+          if (saved === 'true') {
+            document.body.classList.add('darkMode');
+          } else if (saved === 'false') {
+            document.body.classList.remove('darkMode');
+          }
         }
+
+        function myFunction() {
+          const isNowDark = document.body.classList.toggle('darkMode');
+          localStorage.setItem('darkMode', isNowDark ? 'true' : 'false');
+        }
+
+        document.addEventListener('DOMContentLoaded', applySavedDarkMode);
         </script>
       </nav>
     </header>
@@ -36,7 +49,7 @@
         <img src="./images/775637A42108457BB924E15E630A6CC8.jpg" alt="" class="leoFace"/>
         </div>
         <div class="content">
-            <p>I'm a physical oceanographer, working on the interaction between ice and ocean at the University of Gothenburg, Sweden.</p>
+            <p>I'm a physical oceanographer, and observational mathematician, working on the interaction between ice and ocean at the University of Gothenburg, Sweden.</p>
             <p> I use ocean observations, mathematics and numerical models to tell stories about the way small interactions can have large impacts on our earth system.</p>
             <p>Previously, I was at Woods Hole Oceanographic Institute (WHOI) for 3 years as a postdoctoral investigator. Prior to WHOI, I completed my PhD joint between the British Antarctic Survey and University of Cambridge.</p>
             

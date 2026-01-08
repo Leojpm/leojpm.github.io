@@ -2,18 +2,106 @@
 <html lang="en">
   <head>
     <title>Publications</title>
+    <style>
+      /* Page layout */
+      body {
+      font-family: Epilogue, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      line-height: 1.5;
+      margin: 0;
+      background: #fafafa;
+      color: #111;
+      }
+
+      main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      }
+
+      section {
+      background: #fff;
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 6px 18px rgba(22, 27, 34, 0.06);
+      }
+
+      /* Publications list */
+      #publications {
+      margin-top: 0.5rem;
+      }
+
+      #publications h3 {
+      margin: 1.25rem 0 0.5rem;
+      font-size: 1.05rem;
+      border-bottom: 1px solid #e6e6e6;
+      padding-bottom: 0.35rem;
+      }
+
+      #publications ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      }
+
+      #publications li {
+      padding: 0.75rem 0;
+      border-bottom: 1px dashed #eee;
+      }
+
+      #publications li div {
+      margin: 0.18rem 0;
+      }
+
+      #publications a {
+      color: #0b66c3;
+      text-decoration: none;
+      }
+
+      #publications a:hover {
+      text-decoration: underline;
+      }
+
+      /* smaller controls area */
+      #publications a[download] { margin-left: 8px; }
+      header.headerClass { padding: 0.75rem 1rem; }
+    </style>
+
+    <script>
+      // Post-process rendered publication text nodes to remove stray braces
+      // (e.g. {A} {Title} -> A Title). This is a lightweight fix so BibTeX
+      // capitalization braces do not appear verbatim on the page.
+      document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('publications');
+      if (!container) return;
+
+      function cleanBraces(root) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+        let n;
+        while ((n = walker.nextNode())) {
+        if (n.nodeValue && /[{}]/.test(n.nodeValue)) {
+          // remove literal braces but keep content and capitalization
+          n.nodeValue = n.nodeValue.replace(/[{}]/g, '');
+        }
+        }
+      }
+
+      // run once (in case entries already rendered) and observe future changes
+      cleanBraces(container);
+      const mo = new MutationObserver(() => cleanBraces(container));
+      mo.observe(container, { childList: true, subtree: true, characterData: true });
+      });
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href='https://fonts.googleapis.com/css?family=Epilogue' rel='stylesheet'>
-    <script type="module" src="script.js"></script>
   </head>
   <body>
     <header class="headerClass">
-      <h1>Leo Middleton </h1> 
+      <h1>Leo Middleton</h1> 
       <nav> 
-        <a href="/index.html">About </a>
+        <a href="/index.html">About</a>
         <a href="/research.html">Research</a>
         <a href="/" aria-current="page">Publications</a>
         <a href="/CV.html">CV</a>
@@ -23,13 +111,216 @@
         </button>
 
         <script>
-        function myFunction() {
-        var element = document.body;
-        element.classList.toggle("darkMode");
-        }
+        (function(){
+          const STORAGE_KEY = 'darkMode';
+          const body = document.body;
+          function apply(value){
+            if (value === 'true') body.classList.add('darkMode');
+            else body.classList.remove('darkMode');
+          }
+          // initialize from storage
+          apply(localStorage.getItem(STORAGE_KEY));
+          // toggle and persist
+          window.myFunction = function(){
+            const isDark = body.classList.toggle('darkMode');
+            localStorage.setItem(STORAGE_KEY, isDark);
+          };
+          // sync across tabs
+          window.addEventListener('storage', (e) => {
+            if (e.key === STORAGE_KEY) apply(e.newValue);
+          });
+        })();
         </script>
       </nav>
     </header>
+    <main>
+      <section>
+        <h2>Publications</h2>
+        <div id="publications">Loading publications…</div>
+      </section>
+    </main>
 
+    <script>
+    // Fetch and render entries from a BibTeX file named "publications.bib" placed in the same folder.
+    // Basic BibTeX parser: handles @type{key, field = {value}, ...} with braces or quotes.
+    (async function () {
+      const bibPath = './publications.bib';
+      const out = document.getElementById('publications');
+
+      try {
+        const res = await fetch(bibPath);
+        if (!res.ok) throw new Error('Could not fetch ' + bibPath);
+        const text = await res.text();
+        const entries = parseBibtex(text);
+        if (!entries.length) {
+          out.innerText = 'No entries found in ' + bibPath;
+          return;
+        }
+        renderEntries(entries, out);
+      } catch (e) {
+        out.innerText = 'Error loading publications: ' + e.message;
+      }
+    })();
+
+    function parseBibtex(text) {
+      const entries = [];
+      // Split top-level entries by looking for @TYPE{...}
+      const entryRegex = /@([a-zA-Z0-9_]+)\s*{\s*([^,]+),([\s\S]*?)}\s*(?=@|$)/g;
+      let m;
+      while ((m = entryRegex.exec(text)) !== null) {
+        const type = m[1].trim();
+        const key = m[2].trim();
+        const body = m[3];
+        const fields = {};
+        // field = {value} or "value" or bare (until comma)
+        const fieldRegex = /([a-zA-Z0-9_\-]+)\s*=\s*(\{([\s\S]*?)\}|"([^"]*?)"|([^,}\n]+))\s*(,|$)/g;
+        let f;
+        while ((f = fieldRegex.exec(body)) !== null) {
+          const name = f[1].toLowerCase();
+          const value = (f[3] ?? f[4] ?? f[5] ?? '').trim();
+          fields[name] = cleanupValue(value);
+        }
+        entries.push({ type, key, fields });
+      }
+      return entries;
+    }
+
+    function cleanupValue(val) {
+      // Remove outer braces that may remain, collapse extra whitespace, keep LaTeX braces inside
+      return val.replace(/^\s*{\s*|\s*}\s*$/g, '').replace(/\s+/g, ' ').trim();
+    }
+
+    function renderEntries(entries, container) {
+      // derive year for grouping
+      entries.forEach(e => {
+        const f = e.fields;
+        let year = f.year || '';
+        if (!year && f.date) { // date may be YYYY-MM-DD
+          const d = f.date.match(/\d{4}/);
+          year = d ? d[0] : '';
+        }
+        // Keep a human-readable display label separate from the internal sort/group key.
+        // Use a high numeric group key ("9999") for entries without a year so they sort first,
+        // but remember the original label so we can replace the header text later.
+        e._displayYear = year ? year : 'In Preparation';
+        // internal grouping key used for sorting (numeric strings preferred by later sort)
+        e._year = year ? String(year) : '9999';
+        }); // end of the outer entries.forEach
+
+        // map internal key -> visible label for later header fixup
+        const yearLabelMap = entries.reduce((m, e) => (m[e._year] = e._displayYear, m), {});
+
+        // Observe the container and, once the group headers are created, replace the
+        // numeric/internal keys with the human-readable labels. Disconnect after first fix.
+        const headerObserver = new MutationObserver(() => {
+          const headers = container.querySelectorAll('h3');
+          let replacedAny = false;
+          headers.forEach(h => {
+            const key = h.textContent.trim();
+            if (yearLabelMap[key] && !h.dataset._labelReplaced) {
+              h.textContent = yearLabelMap[key];
+              h.dataset._labelReplaced = '1';
+              replacedAny = true;
+            }
+          });
+          if (replacedAny) headerObserver.disconnect();
+        });
+        headerObserver.observe(container, { childList: true, subtree: true });
+
+      // group by year and sort descending (numeric years first)
+      const groups = entries.reduce((acc, e) => {
+        (acc[e._year] ||= []).push(e);
+        return acc;
+      }, {});
+
+      const years = Object.keys(groups).sort((a,b) => {
+        const na = parseInt(a) || 0;
+        const nb = parseInt(b) || 0;
+        if (na === nb) return a.localeCompare(b);
+        return nb - na;
+      });
+
+      container.innerHTML = '';
+      years.forEach(year => {
+        const h3 = document.createElement('h3');
+        h3.textContent = year;
+        container.appendChild(h3);
+
+        const ul = document.createElement('ul');
+        groups[year].forEach(entry => {
+          const li = document.createElement('li');
+
+          const title = entry.fields.title || '(no title)';
+          const authors = entry.fields.author || entry.fields.editor || '';
+          const venue = entry.fields.journal || entry.fields.booktitle || entry.fields.publisher || '';
+          const doi = entry.fields.doi || '';
+          const url = entry.fields.url || '';
+
+          const titleEl = document.createElement('div');
+          titleEl.innerHTML = '<strong>Title:</strong> ' + escapeHtml(title);
+          li.appendChild(titleEl);
+
+            if (authors) {
+            const aEl = document.createElement('div');
+            // escape authors then wrap matching author names in <strong>
+            const escapedAuthors = escapeHtml(authors);
+            const namesToBold = ['Middleton, Leo', 'Middleton, L., Middleton, L'];
+            let highlighted = escapedAuthors;
+            namesToBold.forEach(name => {
+              const escName = escapeHtml(name);
+              const re = new RegExp(escName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+              highlighted = highlighted.replace(re, '<strong>' + escName + '</strong>');
+            });
+            aEl.innerHTML = '<strong>Authors:</strong> ' + highlighted;
+            li.appendChild(aEl);
+            }
+
+          if (venue) {
+            const vEl = document.createElement('div');
+            vEl.innerHTML = '<strong>Journal:</strong> ' + escapeHtml(venue);
+            li.appendChild(vEl);
+          }
+
+          if (doi || url) {
+            const linkEl = document.createElement('div');
+            if (doi) linkEl.innerHTML = `<a href="https://doi.org/${encodeURI(doi)}" target="_blank" rel="noopener">View DOI</a>`;
+            else linkEl.innerHTML = `<a href="${escapeAttr(url)}" target="_blank" rel="noopener">View DOI</a>`;
+            li.appendChild(linkEl);
+          }
+
+          ul.appendChild(li);
+        });
+        container.appendChild(ul);
+      });
+    }
+
+    function makeSingleBib(entry) {
+      const lines = [];
+      lines.push(`@${entry.type}{${entry.key},`);
+      const fields = entry.fields;
+      for (const k of Object.keys(fields)) {
+        lines.push(`  ${k} = {${fields[k]}} ,`);
+      }
+      // remove trailing comma from last field
+      if (lines.length > 1) {
+        lines[lines.length -1] = lines[lines.length -1].replace(/\s*,\s*$/, '');
+      }
+      lines.push('}');
+      return lines.join('\n');
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeAttr(s) {
+      return encodeURI(s);
+    }
+    </script>
   </body>
 </html>

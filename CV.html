@@ -23,13 +23,34 @@
         </button>
 
         <script>
-        function myFunction() {
-        var element = document.body;
-        element.classList.toggle("darkMode");
-        }
+        (function(){
+          const STORAGE_KEY = 'darkMode';
+          const body = document.body;
+          function apply(value){
+            if (value === 'true') body.classList.add('darkMode');
+            else body.classList.remove('darkMode');
+          }
+          // initialize from storage
+          apply(localStorage.getItem(STORAGE_KEY));
+          // toggle and persist
+          window.myFunction = function(){
+            const isDark = body.classList.toggle('darkMode');
+            localStorage.setItem(STORAGE_KEY, isDark);
+          };
+          // sync across tabs
+          window.addEventListener('storage', (e) => {
+            if (e.key === STORAGE_KEY) apply(e.newValue);
+          });
+        })();
         </script>
       </nav>
     </header>
+    <main>
+      <div class="backgroundPic"> 
+      <img src="./images/775637A42108457BB924E15E630A6CC8.jpg" alt="" class="leoFace"/>
+      </div>
+    </main>
+    <div style="height:92px" aria-hidden="true"></div>
     <embed src="./pdfs/CV_Leo_Middleton.pdf" type="application/pdf" width="100%" height="1200px" />
   </body>
 </html>

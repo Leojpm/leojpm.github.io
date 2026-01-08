@@ -8,10 +8,59 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href='https://fonts.googleapis.com/css?family=Epilogue' rel='stylesheet'>
     <script type="module" src="script.js"></script>
+
+    <style>
+      /* Section layout: figure left, text right; stack on small screens */
+      .research-section {
+        padding: 28px 16px;
+        border-bottom: 1px solid rgba(0,0,0,0.08);
+      }
+      .section-inner {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      .section-figure {
+        flex: 0 0 260px;
+      }
+      .section-figure img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 6px;
+        object-fit: cover;
+      }
+      .section-text {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+      .section-text h2 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-size: 1.25rem;
+      }
+      .section-text p {
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      /* Responsive: stack vertically on small screens */
+      @media (max-width: 700px) {
+        .section-inner {
+          flex-direction: column;
+        }
+        .section-figure {
+          flex: 0 0 auto;
+          width: 100%;
+        }
+      }
+    </style>
   </head>
   <body>
     <header class="headerClass">
-      <h1>Leo Middleton </h1> 
+      <h1>Leo Middleton</h1> 
       <nav> 
         <a href="/index.html">About </a>
         <a href="/" aria-current="page">Research</a>
@@ -23,46 +72,96 @@
         </button>
 
         <script>
-        function myFunction() {
-        var element = document.body;
-        element.classList.toggle("darkMode");
-        }
+        (function(){
+          const STORAGE_KEY = 'darkMode';
+          const body = document.body;
+          function apply(value){
+            if (value === 'true') body.classList.add('darkMode');
+            else body.classList.remove('darkMode');
+          }
+          apply(localStorage.getItem(STORAGE_KEY));
+          window.myFunction = function(){
+            const isDark = body.classList.toggle('darkMode');
+            localStorage.setItem(STORAGE_KEY, isDark);
+          };
+          window.addEventListener('storage', (e) => {
+            if (e.key === STORAGE_KEY) apply(e.newValue);
+          });
+        })();
         </script>
       </nav>
     </header>
     <main>
-        <div class="projects">
-            <div class="grid" style="position: relative; height: 460px">
-                <div class="gridItem" style="position: absolute; left: 0px; top: 0px">
-                <a href = "#">
-                    <div class="card hoverable">
-                    <figure>
-                        <img src="/images/Figure_1_FULL.png" class="gridFig">
-                    </figure>
-                    <div class="cardBody">
-                        Observations of a splitting submesoscale eddy.
-                    </div>
-
-                </div>
-                </a>
-                </div>
-                <div class="gridItem" style="position: absolute; left: 500px; top: 0px">
-                    <a href = "#">
-                        <div class="card hoverable">
-                        <figure>
-                            <img src="/images/Figure3.png" class="gridFig">
-                        </figure>
-                        <div class="cardBody">
-                            Double Diffusive Convection Parameterization.
-                        </div>
-    
-                    </div>
-                    </a>
-                    </div>                
-                    <div class="gridItem" style="position: absolute; left: 520px; top: 0px"></div>
+        <div class="backgroundPic"> 
+        <img src="./images/775637A42108457BB924E15E630A6CC8.jpg" alt="" class="leoFace"/>
+        </div>
+    </main>
+    <main>
+      <section class="research-section" id="ocean-turbulence">
+        <div class="section-inner">
+          <figure class="section-figure">
+            <img src="/images/Turbulence_example_VWing.png" alt="Ocean Turbulence">
+          </figure>
+          <div class="section-text">
+            <h2>Ocean Turbulence</h2>
+            <p style="margin-bottom: 1.25rem;">Ocean turbulence plays a vital role in the earth system. The ocean absorbs over 90% of the excess heat trapped in the earth system due to human emissions. This heat is transported to the deep ocean via a combination of the ocean circulation and turbulent mixing. </p>
+            <ul>
+              <li>How much turbulence is there in the interior ocean and at its boundaries?</li>
+              <li>How does this turbulence interact with a changing climate?</li>
+              <li>As the earth warms, will rates of turbulence change?</li>
+            </ul>
+            <p>I am interested in the causes of ocean turbulence. Specifically, a mechanism known as <em>double-diffusive convection</em>, on which I wrote my PhD thesis.</p>
             </div>
         </div>
-    </main>   
+      </section>
 
+      <section class="research-section" id="submesoscale-dynamics">
+        <div class="section-inner">
+          <figure class="section-figure">
+            <img src="/images/DopplerScatt.png" alt="Submesoscale Dynamics">
+          </figure>
+          <div class="section-text">
+            <h2>Submesoscale Dynamics</h2>
+            <p style="margin-bottom: 1.25rem;">In the ocean, 'submesoscale' refers to particularly intense eddies and currents, where the inertial forces rival the earth's rotational effects. These effects tend to occur at scales between 1 and 10 kilometers.</p>
+            <ul>
+              <li>What role do submesoscale dynamics play in the ocean's heat transport?</li>
+              <li>How do these dynamics interact with sea-ice and ice shelves?</li>
+              <li>What are the implications of submesoscale dynamics for marine ecosystems?</li>
+            </ul>
+            <p>My research is particularly concerned with how the <em>intense flow curvature</em> at submesoscales affects their evolution and interactions with turbulence.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="research-section" id="ice-ocean-interactions">
+        <div class="section-inner">
+          <figure class="section-figure">
+            <img src="/images/Weddell_Sea_Ice.png" alt="Ice-Ocean Interactions">
+          </figure>
+          <div class="section-text">
+            <h2>Ice-Ocean Interactions</h2>
+            <p style="margin-bottom: 1.25rem;">As the climate warms, naturally occurring ice is at threat. The normal formation cycles of sea-ice are being disrupted, and the great ice sheets of Greenland and Antarctica are losing mass at an alarming rate.</p>
+            <ul>
+              <li>How can we accurately parameterize ice melting in climate models?</li>
+              <li>What are the feedbacks between ice melting/freezing and ocean dynamics across scales</li>
+              <li>How will changing ice conditions affect the ocean and climate system?</li>
+            </ul>
+            <p>I am concerned that we still know very little about the small-scale processes that govern ice melting, particularly regarding turbulent mixing and submesoscale dynamics.</p>
+          </div>
+        </div>
+      </section>
+    </main>
   </body>
+</html>
+</html>
+<html lang="en">
+  <head>
+    <title>Research</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Epilogue' rel='stylesheet'>
+    <script type="module" src="script.js"></script>
+  </head>
 </html>

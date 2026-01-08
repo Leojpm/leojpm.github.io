@@ -1,10 +1,13 @@
 * {
     box-sizing: border-box;
   }
+  :root{
+    --site-font: "Epilogue", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
   
   body {
     margin: 0;
-    font-family: system-ui, sans-serif;
+    font-family: var(--site-font);
     color: black;
     background-color: white;
   }
@@ -144,12 +147,12 @@
         background-color: #ccc;
     }
     .content {
-        font-family: 'Epilogue', sans-serif;
-        font-size: 24px;
-        padding-top: 4%;
-        padding-left: 30%;
-        width: 95%;    
-        line-height: 170%;
+      font-family: 'Epilogue', sans-serif;
+      font-size: 24px;
+      padding-top: 4%;
+      padding-left: 30%;
+      width: 95%;    
+      line-height: 170%;
     }
     .projects {
         /* display: flex; */
@@ -193,5 +196,164 @@
         min-height: 1px;
         padding: 1.25rem;
     }
+    /* ---------- Responsive defaults ---------- CHATGPT */
 
+    /* Helps avoid accidental horizontal scrolling on mobile */
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    /* Friendlier default text sizing */
+    body {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    /* Optional: a consistent page container (use in your HTML if you want) */
+    /* .container { width: min(100% - 2rem, 1100px); margin: 0 auto; } */
+
+
+    /* ---------- NAV ---------- */
+
+    nav {
+      /* allow wrapping on small screens */
+      flex-wrap: wrap;          /* override nowrap */
+      justify-content: center;  /* nicer on phone */
+      gap: 0.75rem;
+      padding: 0.5rem 1rem;
+    }
+
+    nav a {
+      /* scale down on phones, scale up on laptops */
+      font-size: clamp(16px, 3.5vw, 22px);
+      padding: 0.6rem 0.8rem;
+    }
+
+    /* On larger screens, push nav to the right like you had */
+    @media (min-width: 768px) {
+      nav {
+        justify-content: flex-end;
+        gap: 1.5rem;
+      }
+    }
+
+
+    /* ---------- HEADER / HERO ---------- */
+
+    .headerClass {
+      /* height: 10vh can get too small on phones. Let content define height */
+      height: auto;
+      padding: 1rem;
+      gap: 0.75rem;
+    }
+
+    /* Make the face not overlap content on small screens */
+    .leoFace {
+      position: static;                 /* stop absolute positioning on mobile */
+      width: clamp(64px, 18vw, 120px);  /* predictable sizing */
+      border-radius: 9999px;
+      margin-right: 0.5rem;
+    }
+
+    .nameTitle {
+      font-size: clamp(18px, 4vw, 24px);
+    }
+
+    /* On larger screens, you can re-enable the absolute positioning if you like */
+    @media (min-width: 1024px) {
+      .leoFace {
+        position: absolute;
+        left: 5%;
+        top: 20%;
+        width: 12%;
+      }
+
+      .headerClass {
+        padding: 2em;
+      }
+    }
+
+
+    /* ---------- BACKGROUND PIC SECTION ---------- */
+
+    .backgroundPic {
+      height: auto;          /* 20vh can be awkward on very short screens */
+      min-height: 180px;
+      padding: 1.25rem;
+      background-position: center;
+    }
+
+
+    /* ---------- MAIN CONTENT ---------- */
+
+    /* This is the biggest fix: remove the 30% left padding */
+    .content {
+      font-size: clamp(16px, 3.8vw, 20px);
+      padding: 1rem;          /* mobile-friendly */
+      width: 100%;
+      max-width: 75ch;        /* comfortable reading width on laptop */
+      margin: 0 auto;         /* center it */
+      line-height: 1.7;
+    }
+
+    /* On larger screens, add a bit more spacing but keep it centered */
+    @media (min-width: 768px) {
+      .content {
+        padding: 2rem 1.5rem;
+      }
+    }
+
+
+    /* ---------- CARDS / IMAGES ---------- */
+
+    .gridFig {
+      width: min(120px, 30vw); /* was 20% (can get tiny/huge depending on context) */
+    }
+
+    .card {
+      /* cards will shrink nicely on phone if you give them breathing room */
+      margin: 0.75rem 0;
+    }
+
+
+    /* ---------- Collapsible tap targets ---------- */
+
+    .collapsible {
+      padding: 14px 16px;
+      font-size: clamp(14px, 3.5vw, 16px);
+    }
+
+        /* Layout */
+    .research-section .section-inner{
+      display: grid;
+      font-family: var(--site-font);
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); /* image bigger than text */
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* Make the figure/image fill the left column */
+    .research-section .section-figure{
+      margin: 0;            /* remove default figure margins */
+      width: 100%;
+    }
+
+    .research-section .section-figure img{
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 100%;      /* never overflow its container */
+    }
+
+    /* Mobile: stack and keep within page */
+    @media (max-width: 768px){
+      .research-section .section-inner{
+        grid-template-columns: 1fr;
+      }
+
+      .research-section .section-figure{
+        order: -1;          /* optional: put image above text */
+      }
+    }
     

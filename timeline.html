@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scroll Timeline</title>
+  <style>
+    :root {
+      --bg: #0b0b0f;
+      --fg: #f3f3f6;
+      --muted: rgba(243,243,246,.72);
+      --card: rgba(255,255,255,.06);
+      --cardBorder: rgba(255,255,255,.10);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+      --gap: 24px;
+      --pad: clamp(16px, 3vw, 28px);
+      --cardW: min(78vw, 560px);
+      --cardH: min(72vh, 560px);
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 700px at 20% 10%, rgba(120,90,255,.18), transparent 55%),
+                  radial-gradient(900px 600px at 80% 30%, rgba(0,200,255,.10), transparent 55%),
+                  var(--bg);
+      color: var(--fg);
+    }
+
+    header {
+      padding: clamp(18px, 4vw, 44px) var(--pad);
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    header h1 { margin: 0 0 10px; font-size: clamp(26px, 4vw, 46px); }
+    header p  { margin: 0; color: var(--muted); max-width: 65ch; line-height: 1.5; }
+
+    /* The scroll-controlled section */
+    .timeline {
+      position: relative;
+      /* height is set dynamically via JS to match track width */
+    }
+
+    .timeline__sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 18px var(--pad);
+      box-sizing: border-box;
+    }
+
+    .timeline__top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .timeline__top .kicker {
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .timeline__top .hint {
+      font-size: 12px;
+      color: var(--muted);
+      user-select: none;
+    }
+
+    .timeline__viewport {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .timeline__track {
+      display: flex;
+      gap: var(--gap);
+      will-change: transform;
+      transform: translate3d(0,0,0);
+      padding: 22px 0;
+    }
+
+    .tl-card {
+      width: var(--cardW);
+      height: var(--cardH);
+      background: var(--card);
+      border: 1px solid var(--cardBorder);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: 48% 1fr;
+      flex: 0 0 auto;
+      position: relative;
+    }
+
+    .tl-card__media {
+      position: relative;
+      background: rgba(255,255,255,.04);
+    }
+    .tl-card__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: saturate(1.05) contrast(1.05);
+    }
+
+    .tl-card__body {
+      padding: 16px 18px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .tl-card__meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tl-card__title {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .tl-card__desc {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .tl-card__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 2px;
+    }
+    .tag {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.84);
+      white-space: nowrap;
+    }
+
+    /* Progress bar */
+    .timeline__progress {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      gap: 10px;
+      padding-bottom: 8px;
+    }
+    .bar {
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.10);
+      overflow: hidden;
+    }
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: rgba(255,255,255,.75);
+      transform-origin: left center;
+    }
+    .timeline__label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Active card treatment */
+    .tl-card.is-active {
+      outline: 2px solid rgba(255,255,255,.30);
+      transform: translateY(-2px);
+    }
+
+    /* Reduced motion: disable the transform “animation” and show a normal vertical stack */
+    @media (prefers-reduced-motion: reduce) {
+      .timeline__sticky { position: relative; height: auto; overflow: visible; }
+      .timeline__track { transform: none !important; flex-direction: column; }
+      .tl-card { width: 100%; height: auto; grid-template-rows: 240px 1fr; }
+      .timeline { height: auto !important; }
+      .timeline__top .hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Research Timeline</h1>
+    <p>Scroll to move through milestones. Each card can hold an image, a short story, and key outcomes (papers, talks, grants, tools, etc.).</p>
+  </header>
+
+  <section class="timeline" id="timeline">
+    <div class="timeline__sticky">
+      <div class="timeline__top">
+        <div class="kicker">Scroll timeline</div>
+        <div class="hint">Scroll ↓ to move →</div>
+      </div>
+
+      <div class="timeline__viewport">
+        <div class="timeline__track" id="track" aria-label="Research milestones"></div>
+      </div>
+
+      <div class="timeline__progress" aria-hidden="true">
+        <div class="bar"><span id="barFill"></span></div>
+        <div class="timeline__label">
+          <span id="leftLabel">Start</span>
+          <span id="rightLabel">End</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // 1) Put your career milestones here (swap image paths + text)
+    const MILESTONES = [
+      {
+        year: "2016",
+        title: "First research project",
+        desc: "Short description of what you did and why it mattered.",
+        img: "images/milestone-01.jpg",
+        tags: ["undergrad", "first poster"]
+      },
+      {
+        year: "2019",
+        title: "Started PhD / new lab",
+        desc: "What question pulled you in? What methods did you pick up?",
+        img: "images/milestone-02.jpg",
+        tags: ["PhD", "methods", "collab"]
+      },
+      {
+        year: "2021",
+        title: "Key paper / breakthrough",
+        desc: "One sentence about the result + one about the impact.",
+        img: "images/milestone-03.jpg",
+        tags: ["publication", "conference talk"]
+      },
+      {
+        year: "2024",
+        title: "Current direction",
+        desc: "Where your research is heading next (and what you're excited about).",
+        img: "images/milestone-04.jpg",
+        tags: ["open problems", "future work"]
+      }
+    ];
+
+    const timeline = document.getElementById("timeline");
+    const track = document.getElementById("track");
+    const barFill = document.getElementById("barFill");
+    const leftLabel = document.getElementById("leftLabel");
+    const rightLabel = document.getElementById("rightLabel");
+
+    // Render cards
+    track.innerHTML = MILESTONES.map((m, i) => `
+      <article class="tl-card" data-index="${i}">
+        <div class="tl-card__media">
+          <img src="${m.img}" alt="" loading="lazy" decoding="async">
+        </div>
+        <div class="tl-card__body">
+          <div class="tl-card__meta">
+            <span>${m.year}</span>
+            <span>${i + 1} / ${MILESTONES.length}</span>
+          </div>
+          <h3 class="tl-card__title">${m.title}</h3>
+          <p class="tl-card__desc">${m.desc}</p>
+          <div class="tl-card__tags">
+            ${(m.tags || []).map(t => `<span class="tag">${t}</span>`).join("")}
+          </div>
+        </div>
+      </article>
+    `).join("");
+
+    leftLabel.textContent = MILESTONES[0]?.year ?? "Start";
+    rightLabel.textContent = MILESTONES.at(-1)?.year ?? "End";
+
+    const cards = Array.from(track.querySelectorAll(".tl-card"));
+
+    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+    function setTimelineHeight() {
+      // Amount of horizontal travel we need
+      const travel = Math.max(0, track.scrollWidth - window.innerWidth);
+      // Make section tall enough to “spend scroll” on that travel
+      timeline.style.height = (travel + window.innerHeight) + "px";
+    }
+
+    function getProgress() {
+      const rect = timeline.getBoundingClientRect();
+      const start = window.scrollY + rect.top;
+      const end = start + timeline.offsetHeight - window.innerHeight;
+      const p = (window.scrollY - start) / (end - start);
+      return clamp(p, 0, 1);
+    }
+
+    function setActiveCard(x) {
+      // x is negative (track moved left). Convert to "virtual scroll position" on the track.
+      const viewportCenterOnTrack = (-x) + window.innerWidth / 2;
+      let best = { idx: 0, dist: Infinity };
+
+      for (let i = 0; i < cards.length; i++) {
+        const c = cards[i];
+        const center = c.offsetLeft + c.offsetWidth / 2;
+        const d = Math.abs(center - viewportCenterOnTrack);
+        if (d < best.dist) best = { idx: i, dist: d };
+      }
+
+      cards.forEach((c, i) => c.classList.toggle("is-active", i === best.idx));
+    }
+
+    function onScroll() {
+      const p = getProgress();
+      const travel = Math.max(0, track.scrollWidth - window.innerWidth);
+      const x = -p * travel;
+
+      track.style.transform = `translate3d(${x}px, 0, 0)`;
+      barFill.style.width = (p * 100).toFixed(2) + "%";
+      setActiveCard(x);
+    }
+
+    // Init + resize handling
+    setTimelineHeight();
+    onScroll();
+
+    let resizeRaf = null;
+    window.addEventListener("resize", () => {
+      cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(() => {
+        setTimelineHeight();
+        onScroll();
+      });
+    }, { passive: true });
+
+    window.addEventListener("scroll", () => requestAnimationFrame(onScroll), { passive: true });
+  </script>
+</body>
+</html>
