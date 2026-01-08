@@ -2,70 +2,6 @@
 <html lang="en">
   <head>
     <title>Publications</title>
-    <style>
-      /* Page layout */
-      body {
-      font-family: Epilogue, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      line-height: 1.5;
-      margin: 0;
-      background: #fafafa;
-      color: #111;
-      }
-
-      main {
-      max-width: 900px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-      }
-
-      section {
-      background: #fff;
-      padding: 1.25rem 1.5rem;
-      border-radius: 8px;
-      box-shadow: 0 6px 18px rgba(22, 27, 34, 0.06);
-      }
-
-      /* Publications list */
-      #publications {
-      margin-top: 0.5rem;
-      }
-
-      #publications h3 {
-      margin: 1.25rem 0 0.5rem;
-      font-size: 1.05rem;
-      border-bottom: 1px solid #e6e6e6;
-      padding-bottom: 0.35rem;
-      }
-
-      #publications ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      }
-
-      #publications li {
-      padding: 0.75rem 0;
-      border-bottom: 1px dashed #eee;
-      }
-
-      #publications li div {
-      margin: 0.18rem 0;
-      }
-
-      #publications a {
-      color: #0b66c3;
-      text-decoration: none;
-      }
-
-      #publications a:hover {
-      text-decoration: underline;
-      }
-
-      /* smaller controls area */
-      #publications a[download] { margin-left: 8px; }
-      header.headerClass { padding: 0.75rem 1rem; }
-    </style>
-
     <script>
       // Post-process rendered publication text nodes to remove stray braces
       // (e.g. {A} {Title} -> A Title). This is a lightweight fix so BibTeX
@@ -133,13 +69,34 @@
         </script>
       </nav>
     </header>
+    <div class="backgroundPic"> 
+      <div class="leoFace">
+        <p>Publications</p>
+      </div>
+    <!-- <img src="./images/775637A42108457BB924E15E630A6CC8.jpg" alt="" class="leoFace"/> -->
+    </div>
+    <div style="height:48px" aria-hidden="true"></div>
     <main>
       <section>
-        <h2>Publications</h2>
         <div id="publications">Loading publications…</div>
       </section>
     </main>
+    <style>
+      /* Add horizontal margins for breathing room */
+      #publications {
+        margin: 0 1.5rem;
+        box-sizing: border-box;
+      }
 
+      /* On wider screens center and constrain width */
+      @media (min-width: 800px) {
+        #publications {
+          max-width: 900px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+      }
+    </style>
     <script>
     // Fetch and render entries from a BibTeX file named "publications.bib" placed in the same folder.
     // Basic BibTeX parser: handles @type{key, field = {value}, ...} with braces or quotes.
@@ -323,4 +280,45 @@
     }
     </script>
   </body>
+  <script>
+  (function(){
+    // Replace the email and githubUrl values below with your real contact info
+    const email = 'leo.middleton@gu.se';
+    const githubUrl = 'https://github.com/Leojpm';
+
+    const footer = document.createElement('footer');
+    footer.className = 'site-footer';
+    footer.setAttribute('role', 'contentinfo');
+    footer.innerHTML = `
+      <div class="footer-inner">
+        <a href="mailto:${email}">${email}</a>
+        <span class="sep" aria-hidden="true">•</span>
+        <a href="${githubUrl}" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-github" aria-hidden="true"></i>
+          GitHub
+        </a>
+      </div>
+    `;
+    document.body.appendChild(footer);
+
+    const css = `
+      .site-footer {
+        padding: 1rem;
+        text-align: center;
+        border-top: 1px solid rgba(0,0,0,0.08);
+        font-size: 0.95rem;
+        background: transparent;
+      }
+      .site-footer a { color: inherit; text-decoration: none; }
+      .site-footer .sep { margin: 0 0.5rem; color: rgba(0,0,0,0.5); }
+      body.darkMode .site-footer { border-top-color: rgba(255,255,255,0.08); }
+      @media (prefers-color-scheme: dark) {
+        .site-footer .sep { color: rgba(255,255,255,0.5); }
+      }
+    `;
+    const style = document.createElement('style');
+    style.appendChild(document.createTextNode(css));
+    document.head.appendChild(style);
+  })();
+  </script>
 </html>

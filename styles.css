@@ -84,8 +84,8 @@
     /* padding-top: 50px; */
     color: #fff;
     text-align: center;
-    padding: 2em;
-    height: 10vh;
+    padding: 1em;
+    height: auto;
     position: relative;
     display: flex;
     justify-content: center;
@@ -96,11 +96,32 @@
   }
 
   .leoFace {
-    width: 20%;
-    border-radius: 190rem;
-    position: absolute;
+    width: clamp(80px, 22vw, 140px);
+    border-radius: 9999px;
+    display: block;
+    margin: 0.5rem auto !important; /* keep it centered on narrow screens */
+    text-align: center;
+    position: absolute;        /* large-screen position (overridden on small screens by the later rule) */
     left: 5%;
-    top: 20%;
+    top: 5%;
+    font-family: var(--site-font);
+    font-size: clamp(26px, 8vw, 42px); /* larger minimum and more responsive scaling on small screens */
+    color: inherit;
+    transition: transform 200ms ease, font-size 200ms ease;
+    background: transparent !important;
+  }
+
+  /* Ensure a bigger, non-overlapping face on very narrow phones */
+  @media (max-width: 420px) {
+    .leoFace {
+      position: relative;
+      left: 0;
+      top: 0;
+      transform: none;
+      width: clamp(90px, 32vw, 120px);
+      font-size: 32px; /* comfortable tap/read size on small screens */
+      margin: 0.5rem auto !important;
+    }
   }
   .nameTitle {
     display: flex;
@@ -147,7 +168,7 @@
         background-color: #ccc;
     }
     .content {
-      font-family: 'Epilogue', sans-serif;
+      font-family: var(--site-font);
       font-size: 24px;
       padding-top: 4%;
       padding-left: 30%;
@@ -249,11 +270,42 @@
     }
 
     /* Make the face not overlap content on small screens */
-    .leoFace {
-      position: static;                 /* stop absolute positioning on mobile */
-      width: clamp(64px, 18vw, 120px);  /* predictable sizing */
+
+    .photo {
       border-radius: 9999px;
-      margin-right: 0.5rem;
+      display: block;
+      margin-left: auto;               /* push the photo to the right edge of its container */
+      align-self: center;              /* if parent is flex, center vertically */
+      width: clamp(80px, 28vw, 260px); /* responsive sizing */
+      max-width: 40%;
+      object-fit: cover;
+      /* slide-in animation from the right */
+      transform: translateX(30%);
+      opacity: 0;
+      transition: transform 600ms ease-out, opacity 600ms ease-out;
+      animation: slideInFromRight 600ms ease-out 1 forwards;
+    }
+
+    @keyframes slideInFromRight {
+      from {
+        transform: translateX(30%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* On very small screens keep it inline with content */
+    @media (max-width: 600px) {
+      .photo {
+        margin-left: 0;
+        width: clamp(56px, 22vw, 120px);
+        transform: translateX(0);
+        opacity: 1;
+        animation: none;
+      }
     }
 
     .nameTitle {
@@ -261,13 +313,6 @@
     }
 
     /* On larger screens, you can re-enable the absolute positioning if you like */
-    @media (min-width: 1024px) {
-      .leoFace {
-        position: absolute;
-        left: 5%;
-        top: 20%;
-        width: 12%;
-      }
 
       .headerClass {
         padding: 2em;

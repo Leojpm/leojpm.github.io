@@ -11,7 +11,7 @@
   </head>
   <body>
     <header class="headerClass">
-      <h1>Leo Middleton </h1> 
+      <h1>Leo Middleton</h1>
       <nav> 
         <a href="/" aria-current="page">About </a>
         <a href="/research.html">Research</a>
@@ -46,13 +46,28 @@
     
     <main>
         <div class="backgroundPic"> 
-        <img src="./images/775637A42108457BB924E15E630A6CC8.jpg" alt="" class="leoFace"/>
+          <div class="leoFace">
+            <p>About</p>
+          </div>
+        <!-- <img src="./images/775637A42108457BB924E15E630A6CC8.jpg" alt="" class="leoFace"/> -->
         </div>
-        <div class="content">
+        <style>
+          .bio-row { display:flex; gap:1rem; align-items:center; margin:1.5rem 0; }
+          .bio-row .photo { flex:0 0 40%; max-width:300px; border-radius:8px; object-fit:cover; width:100%; }
+          .bio-row .content { flex:1; }
+          @media (max-width:600px){
+            .bio-row { flex-direction:column; }
+            .bio-row .photo { max-width:none; flex:0 0 auto; }
+          }
+        </style>
+
+        <div class="bio-row">
+          <img src="./images/headshot.png" alt="Leo Middleton" class="photo" />
+          <div class="content">
             <p>I'm a physical oceanographer, and observational mathematician, working on the interaction between ice and ocean at the University of Gothenburg, Sweden.</p>
-            <p> I use ocean observations, mathematics and numerical models to tell stories about the way small interactions can have large impacts on our earth system.</p>
+            <p>I use ocean observations, mathematics and numerical models to tell stories about the way small interactions can have large impacts on our earth system.</p>
             <p>Previously, I was at Woods Hole Oceanographic Institute (WHOI) for 3 years as a postdoctoral investigator. Prior to WHOI, I completed my PhD joint between the British Antarctic Survey and University of Cambridge.</p>
-            
+          </div>
         </div>
         
     </main>
@@ -73,4 +88,45 @@
       </div> -->
 
   </body>
+  <script>
+  (function(){
+    // Replace the email and githubUrl values below with your real contact info
+    const email = 'leo.middleton@gu.se';
+    const githubUrl = 'https://github.com/Leojpm';
+
+    const footer = document.createElement('footer');
+    footer.className = 'site-footer';
+    footer.setAttribute('role', 'contentinfo');
+    footer.innerHTML = `
+      <div class="footer-inner">
+        <a href="mailto:${email}">${email}</a>
+        <span class="sep" aria-hidden="true">•</span>
+        <a href="${githubUrl}" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-github" aria-hidden="true"></i>
+          GitHub
+        </a>
+      </div>
+    `;
+    document.body.appendChild(footer);
+
+    const css = `
+      .site-footer {
+        padding: 1rem;
+        text-align: center;
+        border-top: 1px solid rgba(0,0,0,0.08);
+        font-size: 0.95rem;
+        background: transparent;
+      }
+      .site-footer a { color: inherit; text-decoration: none; }
+      .site-footer .sep { margin: 0 0.5rem; color: rgba(0,0,0,0.5); }
+      body.darkMode .site-footer { border-top-color: rgba(255,255,255,0.08); }
+      @media (prefers-color-scheme: dark) {
+        .site-footer .sep { color: rgba(255,255,255,0.5); }
+      }
+    `;
+    const style = document.createElement('style');
+    style.appendChild(document.createTextNode(css));
+    document.head.appendChild(style);
+  })();
+  </script>
 </html>
