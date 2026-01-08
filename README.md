@@ -1,4 +1,6 @@
-# Website-V2
+# Website
+
+My first attempt at making a website.
 
 ## Start up
 
