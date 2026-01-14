@@ -285,6 +285,14 @@
     // Replace the email and githubUrl values below with your real contact info
     const email = 'leo.middleton@gu.se';
     const githubUrl = 'https://github.com/Leojpm';
+    const githubLinkText = 'Site by @me';
+    // Update the footer link text after the footer is created
+    setTimeout(() => {
+      const anchor = document.querySelector('.site-footer a[href="' + githubUrl + '"]');
+      if (anchor) {
+      anchor.innerHTML = `<i class="fab fa-github" aria-hidden="true"></i> ${githubLinkText}`;
+      }
+    }, 0);
 
     const footer = document.createElement('footer');
     footer.className = 'site-footer';

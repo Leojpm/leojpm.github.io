@@ -108,8 +108,12 @@
     font-size: clamp(26px, 8vw, 42px); /* larger minimum and more responsive scaling on small screens */
     color: inherit;
     transition: transform 200ms ease, font-size 200ms ease;
-    background: transparent !important;
+    background-color: transparent !important;
   }
+
+  p {
+    background-color: transparent;
+  } 
 
   /* Ensure a bigger, non-overlapping face on very narrow phones */
   @media (max-width: 420px) {
@@ -136,6 +140,7 @@
     font-weight: bold;
     color: #000;
   }
+  
   .backgroundPic {
     width: 100%;
     background-image: url(./images/image1.png);
